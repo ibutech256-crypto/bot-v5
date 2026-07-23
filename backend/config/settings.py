@@ -2,9 +2,9 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
-BASE_DIR=Path(__file__).resolve().parents[2]; ROOT_DIR=BASE_DIR.parent
-load_dotenv(ROOT_DIR / ".env")
-load_dotenv(BASE_DIR.parent / ".env")
+BASE_DIR=Path(__file__).resolve().parents[2]
+ROOT_DIR=BASE_DIR
+load_dotenv(BASE_DIR / ".env")
 SECRET_KEY=os.getenv("DJANGO_SECRET_KEY","unsafe-dev-key")
 DEBUG=os.getenv("DJANGO_DEBUG","false").lower()=="true"
 ALLOWED_HOSTS=[x for x in os.getenv("DJANGO_ALLOWED_HOSTS","localhost,127.0.0.1").split(",") if x]
