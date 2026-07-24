@@ -140,7 +140,7 @@ class AdaptiveBrainGate:
         # 1. Forensic Diagnosis
         if is_win:
             diagnosis = (
-                f"🎯 OPTIMAL INSTITUTIONAL EXPANSION: KOD / Turtle Soup sweep confirmed clean order flow momentum (`Score: {score_at_entry}/100`). "
+                f"OPTIMAL INSTITUTIONAL EXPANSION: KOD / Turtle Soup sweep confirmed clean order flow momentum (`Score: {score_at_entry}/100`). "
                 f"ADX ({adx_at_entry:.1f}) and ATR ({atr_at_entry*100:.2f}%) maintained strong directional velocity. "
                 f"Price expanded directly from {entry_price} to Hit TP at {exit_price} (+${float(profit_usd):.2f})."
             )
@@ -157,7 +157,7 @@ class AdaptiveBrainGate:
                 root_cause = "Macro liquidity sweep (Turtle Soup Plus One) extended deeper than initial KOD rejection wick."
             
             diagnosis = (
-                f"🛑 STRUCTURAL PULLBACK / SL HIT: Price retraced from {entry_price} to Hit SL at {exit_price} (-${abs(float(profit_usd)):.2f}). "
+                f"STRUCTURAL PULLBACK / SL HIT: Price retraced from {entry_price} to Hit SL at {exit_price} (-${abs(float(profit_usd)):.2f}). "
                 f"AI Forensic Diagnosis: {root_cause} "
                 f"Adaptive Memory Action: Incrementing consecutive loss streak and applying protective quarantine/sizing reduction."
             )

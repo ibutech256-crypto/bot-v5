@@ -89,6 +89,21 @@ class Command(BaseCommand):
             broker_setting.enable_autotrading = True
             broker_setting.save()
 
+        # Send instant Trading Engine Startup Alert to Telegram (v1.9.5)
+        if tg_client:
+            try:
+                subscribers = TelegramSubscriber.objects.filter(is_deleted=False, signal_alerts=True)
+                start_msg = (
+                    f"INSTITUTIONAL TRADING ENGINE STARTED\n\n"
+                    f"Status: TradingMT5Engine service online and active.\n"
+                    f"MT5 Terminal: Connected (#{login_id} @ {server})\n"
+                    f"Time: {django_tz.now().strftime('%Y-%m-%d %H:%M:%S UTC')}"
+                )
+                for s in subscribers:
+                    tg_client.send_message(s.chat_id, start_msg)
+            except Exception:
+                pass
+
         User = get_user_model()
         admin_user = User.objects.filter(is_superuser=True).first()
         if not admin_user:
@@ -151,15 +166,15 @@ class Command(BaseCommand):
                         eat_now_hb = EATPhaseEngine.get_eat_time()
                         subscribers = TelegramSubscriber.objects.filter(is_deleted=False, signal_alerts=True)
                         hb_msg = (
-                            f"💓 INSTITUTIONAL AI TRADING PLATFORM — 4-HOUR SYSTEM HEARTBEAT\n\n"
-                            f"✅ Status: All 6 Enterprise NSSM Services Active & Operational\n"
-                            f"📡 Exness MT5 Terminal: Online (#{account.account_number} / {broker.server})\n\n"
-                            f"💰 Live Balance: ${float(account.balance):,.2f}\n"
-                            f"📈 Live Equity: ${float(account.equity):,.2f}\n"
-                            f"🕒 Current EAT Time: `{eat_now_hb.strftime('%Y-%m-%d %H:%M:%S')} EAT (UTC+3)`\n\n"
-                            f"⚡ Auto-Execution Gate: `Score >= 80/100` + `KOD Turtle Soup Limit Sniper`\n"
-                            f"🛡️ Risk & Phase Shield: `0.50 Lot Cap`, `4-Factor Spread/ATR Gate`, & `Adaptive Brain Quarantine` Active\n"
-                            f"💬 Next Heartbeat: In 4 hours (`{(eat_now_hb + timedelta(hours=4)).strftime('%H:%M:%S')} EAT`)"
+                            f"INSTITUTIONAL AI TRADING PLATFORM -- 4-HOUR SYSTEM HEARTBEAT\n\n"
+                            f"Status: All 6 Enterprise NSSM Services Active & Operational\n"
+                            f"Exness MT5 Terminal: Online (#{account.account_number} / {broker.server})\n\n"
+                            f"Live Balance: ${float(account.balance):,.2f}\n"
+                            f"Live Equity: ${float(account.equity):,.2f}\n"
+                            f"Current EAT Time: `{eat_now_hb.strftime('%Y-%m-%d %H:%M:%S')} EAT (UTC+3)`\n\n"
+                            f"Auto-Execution Gate: `Score >= 80/100` + `KOD Turtle Soup Limit Sniper`\n"
+                            f"Risk & Phase Shield: `0.50 Lot Cap`, `4-Factor Spread/ATR Gate`, & `Adaptive Brain Quarantine` Active\n"
+                            f"Next Heartbeat: In 4 hours (`{(eat_now_hb + timedelta(hours=4)).strftime('%H:%M:%S')} EAT`)"
                         )
                         for s in subscribers:
                             try:
@@ -292,14 +307,14 @@ class Command(BaseCommand):
 
                                 if tg_client:
                                     subscribers = TelegramSubscriber.objects.filter(is_deleted=False, signal_alerts=True)
-                                    outcome_icon = "🎯 TRADE HIT TAKE PROFIT (TP) 🎯" if is_win else "🛑 TRADE HIT STOP LOSS (SL) 🛑"
+                                    outcome_icon = "TRADE HIT TAKE PROFIT (TP)" if is_win else "TRADE HIT STOP LOSS (SL)"
                                     out_msg = (
                                         f"{outcome_icon}\n\n"
                                         f"Asset: {deal.symbol} | Volume: {deal.volume} Lots\n"
                                         f"Closed P/L: **${deal.profit:,.2f} USD**\n\n"
-                                        f"🧠 **AI Forensic Outcome Diagnosis**:\n"
+                                        f"**AI Forensic Outcome Diagnosis**:\n"
                                         f"{ai_report['diagnosis']}\n\n"
-                                        f"🛡️ **Adaptive Brain Status**: Multiplier {ai_report['sizing_multiplier']}x | Quarantined: {ai_report['is_quarantined']}"
+                                        f"**Adaptive Brain Status**: Multiplier {ai_report['sizing_multiplier']}x | Quarantined: {ai_report['is_quarantined']}"
                                     )
                                     for sub in subscribers:
                                         try:
@@ -343,14 +358,14 @@ class Command(BaseCommand):
                                 if was_sent_to_telegram and tg_client:
                                     self.stdout.write(f"AI SENT-SIGNAL OUTCOME [{active_sig.symbol.symbol}]: Hit {'TP' if hit_tp else 'SL'}. Dispatching outcome to Telegram.")
                                     subscribers = TelegramSubscriber.objects.filter(is_deleted=False, signal_alerts=True)
-                                    s_icon = "🎯 SIGNAL HIT TAKE PROFIT (TP) 🎯" if hit_tp else "🛑 SIGNAL HIT STOP LOSS (SL) 🛑"
+                                    s_icon = "SIGNAL HIT TAKE PROFIT (TP)" if hit_tp else "SIGNAL HIT STOP LOSS (SL)"
                                     s_msg = (
                                         f"{s_icon}\n\n"
                                         f"Asset: {active_sig.symbol.symbol} ({active_sig.strategy_name})\n"
                                         f"Target Entry: {active_sig.entry_price} -> Exit: {tick_sig.bid if active_sig.direction == 'BUY' else tick_sig.ask}\n\n"
-                                        f"🧠 **AI Forensic Outcome Analysis**:\n"
+                                        f"**AI Forensic Outcome Analysis**:\n"
                                         f"{ai_sig_report['diagnosis']}\n\n"
-                                        f"🛡️ **Adaptive Brain Action**: Multiplier adjusted to {ai_sig_report['sizing_multiplier']}x based on backtest expectancy."
+                                        f"**Adaptive Brain Action**: Multiplier adjusted to {ai_sig_report['sizing_multiplier']}x based on backtest expectancy."
                                     )
                                     for sub in subscribers:
                                         try:
@@ -672,7 +687,7 @@ class Command(BaseCommand):
                                                                             if tg_client:
                                                                                 subscribers = TelegramSubscriber.objects.filter(is_deleted=False, signal_alerts=True)
                                                                                 exec_msg = (
-                                                                                    f"🚨 INSTITUTIONAL TRADE EXECUTED 🚨\n\n"
+                                                                                    f"INSTITUTIONAL TRADE EXECUTED\n\n"
                                                                                     f"Account Framework: {eval_result.mode.value} (${float(account.balance):.2f})\n"
                                                                                     f"Symbol: {sym} ({tf_enum.value})\n"
                                                                                     f"Direction: {sig.direction}\n"
@@ -680,8 +695,8 @@ class Command(BaseCommand):
                                                                                     f"Entry Price: {filled_price:.4f}\n"
                                                                                     f"Stop Loss: {exec_sl:.4f}\n"
                                                                                     f"Take Profit: {exec_tp:.4f}\n\n"
-                                                                                    f"⚡ Confluence Score: {sig.confidence:.2f}/100\n"
-                                                                                    f"🛡️ Risk Framework: Max {eval_result.max_open_positions} Open Trades | Daily Target: {eval_result.daily_target_trades}-{eval_result.max_daily_trades} Trades\n"
+                                                                                    f"Confluence Score: {sig.confidence:.2f}/100\n"
+                                                                                    f"Risk Framework: Max {eval_result.max_open_positions} Open Trades | Daily Target: {eval_result.daily_target_trades}-{eval_result.max_daily_trades} Trades\n"
                                                                                     f"Gate Verified: {gate_msg}\n"
                                                                                     f"Ticket: #{ticket_str}"
                                                                                 )
